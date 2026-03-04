@@ -4,7 +4,7 @@ from app.services import facade
 api = Namespace('reviews', description='Review operations')
 
 review_model = api.model('Review', {
-    'comment': fields.String(required=True, description='Written feedback'),
+    'text': fields.String(required=True, description='Written feedback'),
     'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
     'user_id': fields.String(required=True, description='ID of the user'),
     'place_id': fields.String(required=True, description='ID of the place')
@@ -24,13 +24,13 @@ class ReviewList(Resource):
 
         review_data = api.payload
 
-        required_fields = ["comment", "rating", "user_id", "place_id"]
+        required_fields = ["text", "rating", "user_id", "place_id"]
         for field in required_fields:
             if field not in review_data:
                 return {"error": f"{field} is required"}, 400
 
-        if not review_data["comment"] or review_data["comment"].strip() == "":
-            return {"error": "Comment cannot be empty"}, 400
+        if not review_data["text"] or review_data["text"].strip() == "":
+            return {"error": "Text cannot be empty"}, 400
 
         if review_data["rating"] < 1 or review_data["rating"] > 5:
             return {"error": "Rating must be between 1 and 5"}, 400
@@ -40,7 +40,7 @@ class ReviewList(Resource):
 
             return {
                 "id": new_review.id,
-                "comment": new_review.comment,
+                "text": new_review.text,
                 "rating": new_review.rating,
                 "user_id": review_data["user_id"],
                 "place_id": review_data["place_id"]
@@ -58,7 +58,7 @@ class ReviewList(Resource):
 
         return [{
             'id': review.id,
-            'comment': review.comment,
+            'text': review.text,
             'rating': review.rating
         } for review in reviews], 200
 
@@ -78,7 +78,7 @@ class ReviewResource(Resource):
 
         return {
             'id': review.id,
-            'comment': review.comment,
+            'text': review.text,
             'rating': review.rating
         }, 200
 
@@ -106,7 +106,7 @@ class ReviewResource(Resource):
 
             return {
                 'id': updated_review.id,
-                'comment': updated_review.comment,
+                'text': updated_review.text,
                 'rating': updated_review.rating
             }, 200
 
@@ -144,7 +144,7 @@ class PlaceReviewList(Resource):
 
         return [{
             'id': review.id,
-            'comment': review.comment,
+            'text': review.text,
             'rating': review.rating,
             'user_id': review.user_id
         } for review in reviews], 200
