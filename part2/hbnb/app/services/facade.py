@@ -247,9 +247,57 @@ class HBnBFacade:
         """Retrieve review by ID."""
         return self.review_repo.get(review_id)
 
-    def get_reviews(self):
+    def get_reviews_by_place(self, place_id):
+        """
+        Retrieve all reviews for a given place_id.
+
+        Args:
+            place_id (str): ID of the place.
+
+        Returns:
+            list[Review]: Reviews linked to that place.
+        """
+        return [
+            r for r in self.review_repo.get_all()
+            if getattr(r, "place", None)
+            and getattr(r.place, "id", None) == place_id
+        ]
+
+    def get_all_reviews(self):
         """Retrieve all reviews."""
         return self.review_repo.get_all()
+
+    def update_review(self, review_id, review_data):
+        """
+        Update an existing review.
+
+        Args:
+            review_id (str): ID of the review to update.
+            review_data (dict): Fields to update (comment, rating).
+
+        Returns:
+            Review or None: Updated review, or None if not found.
+
+        Raises:
+            ValueError: If validation fails.
+        """
+        review = self.review_repo.get(review_id)
+        if not review:
+            return None
+
+        if "comment" in review_data:
+            if not review_data["comment"] or review_data["comment"].strip() == "":
+                raise ValueError("Comment cannot be empty")
+            review.comment = review_data["comment"]
+
+        if "rating" in review_data:
+            rating = review_data["rating"]
+            if rating < 1 or rating > 5:
+                raise ValueError("Rating must be between 1 and 5")
+            review.rating = int(rating)
+
+        review.save()
+        return review
 
     def delete_review(self, review_id):
         """Delete review."""
