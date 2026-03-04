@@ -362,3 +362,9 @@ class HBnBFacade:
     def delete_amenity(self, amenity_id):
         """Delete amenity."""
         return self.amenity_repo.delete(amenity_id)
+
+    def reset(self):
+        self.user_repo = InMemoryRepository()
+        self.place_repo = InMemoryRepository()
+        self.review_repo = InMemoryRepository()
+        self.amenity_repo = InMemoryRepository()

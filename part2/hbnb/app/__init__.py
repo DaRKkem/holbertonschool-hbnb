@@ -21,6 +21,10 @@ def create_app(config_name="default"):
         Flask: Configured Flask application instance.
     """
     app = Flask(__name__)
+
+    from app.services import facade
+    facade.reset()
+
     app.config.from_object(config[config_name])
 
     # Register API Blueprint

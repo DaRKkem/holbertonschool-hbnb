@@ -146,3 +146,25 @@ class PlaceResource(Resource):
             'owner_id': place.owner.id,
             'amenities': [{'id': a.id, 'name': a.name} for a in place.amenities]
         }, 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+
+        place = facade.get_place(place_id)
+        if not place:
+            return {'error': 'Place not found'}, 404
+
+        reviews = facade.get_reviews_by_place(place_id)
+
+        return [{
+            'id': review.id,
+            'text': review.text,
+            'rating': review.rating,
+            'user_id': review.user.id,
+            "place_id": review.place.id
+        } for review in reviews], 200
