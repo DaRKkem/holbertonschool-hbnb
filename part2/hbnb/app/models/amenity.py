@@ -13,7 +13,7 @@ class Amenity(BaseModel):
         places (list): Places that include this amenity.
     """
 
-    def __init__(self, name, description):
+    def __init__(self, name, description=""):
         """
         Initialize an Amenity instance.
 
