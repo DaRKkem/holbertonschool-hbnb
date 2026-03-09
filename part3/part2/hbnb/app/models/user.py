@@ -1,8 +1,7 @@
 # app/models/user.py
 import re
-import hashlib
 from app.models.base_model import BaseModel
-
+from app import bcrypt
 
 class User(BaseModel):
     """
@@ -12,7 +11,7 @@ class User(BaseModel):
         first_name (str): First name of the user, max 50 characters.
         last_name (str): Last name of the user, max 50 characters.
         email (str): User's email address, must be valid format.
-        password_hash (str): SHA256 hash of the user's password.
+        password (str): Bcrypt hash of the user's password.
         is_admin (bool): Indicates if the user has admin privileges.
         places (list): List of Place instances owned by the user.
         reviews (list): List of Review instances written by the user.
@@ -26,7 +25,7 @@ class User(BaseModel):
             first_name (str): User's first name.
             last_name (str): User's last name.
             email (str): User's email address.
-            password (str): User's password.
+            password (str): User's plain-text password (will be hashed).
             is_admin (bool, optional): Admin flag. Defaults to False.
 
         Raises:
@@ -43,7 +42,7 @@ class User(BaseModel):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.set_password(password)
+        self.hash_password(password)
         self.is_admin = is_admin
 
         self.places = []
@@ -98,26 +97,26 @@ class User(BaseModel):
     # -------------------
     # Password Handling
     # -------------------
-    def set_password(self, password: str):
+    def hash_password(self, password):
         """
-        Hash the password and store it in password_hash.
+        Hashes the password using bcrypt before storing it.
 
         Args:
             password (str): Plain-text password.
         """
-        self.password_hash = hashlib.sha256(password.encode()).hexdigest()
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def check_password(self, password: str) -> bool:
+    def verify_password(self, password):
         """
-        Check if the given password matches the stored hash.
+        Verifies if the provided password matches the hashed password.
 
         Args:
-            password (str): Plain-text password to check.
+            password (str): Plain-text password to verify.
 
         Returns:
             bool: True if password matches, False otherwise.
         """
-        return self.password_hash == hashlib.sha256(password.encode()).hexdigest()
+        return bcrypt.check_password_hash(self.password, password)
 
     # -------------------
     # Business Methods
@@ -135,7 +134,7 @@ class User(BaseModel):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.set_password(password)
+        self.hash_password(password)
 
     def update_profile(self, first_name, last_name, email):
         """
@@ -158,7 +157,7 @@ class User(BaseModel):
         Args:
             new_password (str): New plain-text password.
         """
-        self.set_password(new_password)
+        self.hash_password(new_password)
         self.save()
 
     def delete_account(self):

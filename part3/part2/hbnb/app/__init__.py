@@ -6,6 +6,10 @@ for the HBnB project.
 """
 
 from flask import Flask
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
+
 from app.api import api_bp
 
 
@@ -15,6 +19,7 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     Args:
         config_class (str): Dotted path to the configuration class.
+                            Defaults to DevelopmentConfig.
 
     Returns:
         Flask: Configured Flask application instance.
@@ -22,6 +27,8 @@ def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
 
     app.config.from_object(config_class)
+
+    bcrypt.init_app(app)
 
     from app.services import facade
     facade.reset()
