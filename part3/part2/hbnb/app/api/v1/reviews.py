@@ -1,12 +1,18 @@
-    """
-    Review API module.
+"""
+Review API module.
 
-    This module defines the RESTful endpoints for managing Review objects
-    in the Hbnb application. Protected endpoints require JWT authentication.
-    """
+This module defines the RESTful endpoints for managing Review objects
+in the Hbnb application. Protected endpoints require JWT authentication.
+
+Access rules:
+- POST /    : Authenticated (user_id = current user, not own place, not duplicate)
+- GET /    : Public
+- GET /<id>    : Author OR Admin
+- DELETE /<id>  :Author OR Admin
+"""
 
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
@@ -30,7 +36,6 @@ class ReviewList(Resource):
     @api.response(201, 'Review successfully created')
     @api.response(400, 'Invalid input data')
     @api.response(401, 'Authentication required')
-    @api.response(403, 'Forbidden - cannot review own place')
     def post(self):
         """Create a new review. Requires authentication."""
         current_user = get_jwt_identity()
@@ -114,13 +119,15 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review. Only the author can modify it."""
         current_user = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        # Only the author can update their review
-        if review.user.id != current_user:
+        # Admin bypasses ownership check
+        if not is_admin and review.user.id !=current_user:
             return {'error': 'Unauthorized action'}, 403
 
         update_data = api.payload
@@ -140,13 +147,15 @@ class ReviewResource(Resource):
     def delete(self, review_id):
         """Delete a review. Only the author can delete it."""
         current_user = get_jwt_identity()
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
 
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
 
-        # Only the author can delete their review
-        if review.user.id != current_user:
+        # Admin bypasses ownership check
+        if not is_admin and review.user.id != current_user:
             return {'error': 'Unauthorized action'}, 403
 
         facade.delete_review(review_id)
