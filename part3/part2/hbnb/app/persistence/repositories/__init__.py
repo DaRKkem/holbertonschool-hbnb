@@ -1,0 +1,1 @@
+"""Repositories package - entity-specific repository classes."""
