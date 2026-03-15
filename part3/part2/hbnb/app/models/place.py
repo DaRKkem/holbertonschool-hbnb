@@ -32,6 +32,11 @@ class Place(BaseModel):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
 
+
+    #------------------------
+    # Validateurs SQLAlchemy
+    #------------------------
+
     @validates('title')
     def validate_title(self, key, value):
         if not value or len(value) > 100:
