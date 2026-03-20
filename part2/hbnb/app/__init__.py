@@ -1,16 +1,33 @@
+"""
+Application factory module.
+
+Creates and configures the Flask application instance
+for the HBnB project.
+"""
+
 from flask import Flask
-from flask_restx import Api
+from config import config
+from app.api import api_bp
 
-def create_app():
+
+def create_app(config_name="default"):
+    """
+    Application factory function.
+
+    Args:
+        config_name (str): Configuration profile name.
+
+    Returns:
+        Flask: Configured Flask application instance.
+    """
     app = Flask(__name__)
-    api = Api(app, version='1.0', title='HBnB API', description='HBnB Application API', doc='/api/v1/')
 
-    from app.api.v1.users import api as users_ns
-    from app.api.v1.amenities import api as amenities_ns
-    from app.api.v1.places import api as places_ns
+    from app.services import facade
+    facade.reset()
 
-    api.add_namespace(users_ns, path='/api/v1/users')
-    api.add_namespace(amenities_ns, path='/api/v1/amenities')
-    api.add_namespace(places_ns, path='/api/v1/places')
+    app.config.from_object(config[config_name])
+
+    # Register API Blueprint
+    app.register_blueprint(api_bp)
 
     return app
