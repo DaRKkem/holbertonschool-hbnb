@@ -24,6 +24,16 @@ from app.api.v1.reviews import api as reviews_ns
 from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.auth import api as auth_ns
 
+#Decclaration du schema JWT pour le bouton Authorize dans Swagger
+authorizations = {
+    'Bearer': {
+        'tupe': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
+        'description': 'Tape: Bearer <ton_token>'
+    }
+}
+
 # Create RESTx API instance
 api = Api(
     api_bp,
@@ -31,6 +41,8 @@ api = Api(
     title="HBnB API",
     description="HBnB Application REST API (Version 1)",
     doc="/"
+    authorizations=authorizations
+    security='Bearer'
 )
 
 # Register namespaces with version prefix
