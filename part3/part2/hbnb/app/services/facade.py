@@ -26,9 +26,9 @@ class HBnBFacade:
     def __init__(self):
         """Initialize repositories for users, places, reviews, and amenities."""
         self.user_repo = UserRepository()
-        self.place_repo = SQLAlchemyRepository(Place)
-        self.review_repo = SQLAlchemyRepository(Review)
-        self.amenity_repo = SQLAlchemyRepository(Amenity)
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
     # ==================================================
     # USER METHODS
@@ -132,6 +132,7 @@ class HBnBFacade:
             price=place_data["price"],
             latitude=place_data["latitude"],
             longitude=place_data["longitude"],
+            owner_id=place_data["owner_id"],
         )
 
         # Attach amenities if provided
@@ -239,9 +240,9 @@ class HBnBFacade:
 
         review = Review(
             rating=review_data["rating"],
-            text=review_data.get("text", ""),
-            user=user,
-            place=place,
+            text=review_data["rating"],
+            user_id=review_data["user_id"],
+            place_id=review_data["place_id"],
         )
 
         self.review_repo.add(review)
