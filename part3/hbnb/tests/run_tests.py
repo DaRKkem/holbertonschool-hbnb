@@ -116,14 +116,14 @@ def test_initial_data(conn):
 
     admin = get_one(conn, "SELECT id, email, is_admin FROM users WHERE email = ?", (ADMIN_EMAIL,))
     test("0.1 — Admin existe avec is_admin = TRUE",
-         admin and admin[2] == 1)
+        admin and admin[2] == 1)
 
     test("0.2 — Admin a l'ID fixe impose par la task",
-         admin and admin[0] == ADMIN_ID)
+        admin and admin[0] == ADMIN_ID)
 
     count = get_count(conn, "SELECT COUNT(*) FROM amenities")
     test("0.3 — 3 amenities initiales presentes",
-         count == 3, f"3, obtenu {count}")
+        count == 3, f"3, obtenu {count}")
 
     wifi = get_one(conn, "SELECT id FROM amenities WHERE id = ?", (WIFI_ID,))
     test("0.4 — WiFi present avec bon UUID", wifi is not None)
@@ -163,15 +163,15 @@ def test_crud_users(conn):
     test("1.2 — Creer un deuxieme utilisateur valide (Jane)", row is not None)
 
     test("1.3 — Rejeter email duplique",
-         expect_error(conn, f"""
-             INSERT INTO users (id, first_name, last_name, email, password, is_admin, created_at, updated_at)
-             VALUES ('dup-user-id', 'Dup', 'User', 'john@test.com', '{BCRYPT_HASH}', FALSE,
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO users (id, first_name, last_name, email, password, is_admin, created_at, updated_at)
+            VALUES ('dup-user-id', 'Dup', 'User', 'john@test.com', '{BCRYPT_HASH}', FALSE,
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     password = get_one(conn, "SELECT password FROM users WHERE email = 'john@test.com'")
     test("1.4 — Mot de passe stocke en hash bcrypt ($2b$)",
-         password and password[0].startswith("$2b$"))
+        password and password[0].startswith("$2b$"))
 
     print("\n  -- READ --")
 
@@ -194,7 +194,7 @@ def test_crud_users(conn):
     test("1.8 — Modifier email valide", row and row[0] == "johnny@test.com")
 
     test("1.9 — Rejeter email duplique sur UPDATE",
-         expect_error(conn, f"UPDATE users SET email = 'jane@test.com' WHERE id = '{JOHN_ID}'"))
+        expect_error(conn, f"UPDATE users SET email = 'jane@test.com' WHERE id = '{JOHN_ID}'"))
 
     print("\n  -- DELETE --")
 
@@ -231,18 +231,18 @@ def test_crud_amenities(conn):
     test("2.1 — Creer une amenity valide (Parking)", row and row[0] == "Parking")
 
     test("2.2 — Rejeter nom duplique",
-         expect_error(conn, f"""
-             INSERT INTO amenities (id, name, created_at, updated_at)
-             VALUES ('aaaa0002-0000-0000-0000-000000000000', 'Parking',
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO amenities (id, name, created_at, updated_at)
+            VALUES ('aaaa0002-0000-0000-0000-000000000000', 'Parking',
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("2.3 — Rejeter nom NULL",
-         expect_error(conn, f"""
-             INSERT INTO amenities (id, name, created_at, updated_at)
-             VALUES ('aaaa0003-0000-0000-0000-000000000000', NULL,
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO amenities (id, name, created_at, updated_at)
+            VALUES ('aaaa0003-0000-0000-0000-000000000000', NULL,
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     print("\n  -- READ --")
 
@@ -255,7 +255,7 @@ def test_crud_amenities(conn):
     conn.commit()
     row = get_one(conn, f"SELECT name FROM amenities WHERE id = '{PARKING_ID}'")
     test("2.5 — Modifier nom Parking -> Parking prive",
-         row and row[0] == "Parking prive")
+        row and row[0] == "Parking prive")
 
     print("\n  -- DELETE --")
 
@@ -284,33 +284,33 @@ def test_crud_places(conn):
     test("3.1 — Creer une place valide", row and row[0] == "Test Place")
 
     test("3.2 — Rejeter owner_id inexistant",
-         expect_error(conn, f"""
-             INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
-             VALUES ('bbbb0002-0000-0000-0000-000000000000', 'Ghost', 'No owner',
-                     50.0, 48.0, 2.0, 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+            VALUES ('bbbb0002-0000-0000-0000-000000000000', 'Ghost', 'No owner',
+                    50.0, 48.0, 2.0, 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("3.3 — Rejeter prix negatif",
-         expect_error(conn, f"""
-             INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
-             VALUES ('bbbb0003-0000-0000-0000-000000000000', 'Bad', 'Neg price',
-                     -10.0, 48.0, 2.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+            VALUES ('bbbb0003-0000-0000-0000-000000000000', 'Bad', 'Neg price',
+                    -10.0, 48.0, 2.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("3.4 — Rejeter latitude hors limites",
-         expect_error(conn, f"""
-             INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
-             VALUES ('bbbb0004-0000-0000-0000-000000000000', 'Bad', 'Bad lat',
-                     50.0, 999.0, 2.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+            VALUES ('bbbb0004-0000-0000-0000-000000000000', 'Bad', 'Bad lat',
+                    50.0, 999.0, 2.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("3.5 — Rejeter longitude hors limites",
-         expect_error(conn, f"""
-             INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
-             VALUES ('bbbb0005-0000-0000-0000-000000000000', 'Bad', 'Bad lng',
-                     50.0, 48.0, 999.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+            VALUES ('bbbb0005-0000-0000-0000-000000000000', 'Bad', 'Bad lng',
+                    50.0, 48.0, 999.0, '{JOHN_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     print("\n  -- READ --")
 
@@ -318,7 +318,7 @@ def test_crud_places(conn):
         SELECT p.title, u.first_name FROM places p JOIN users u ON p.owner_id = u.id
     """)
     test("3.6 — Lire place avec son owner via JOIN",
-         len(rows) == 1 and rows[0][0] == "Test Place")
+        len(rows) == 1 and rows[0][0] == "Test Place")
 
     rows = get_all(conn, f"SELECT id FROM places WHERE owner_id = '{JOHN_ID}'")
     test("3.7 — Lire les places d'un user specifique", len(rows) == 1)
@@ -331,7 +331,7 @@ def test_crud_places(conn):
     test("3.8 — Modifier prix 99.99 -> 149.99", row and abs(row[0] - 149.99) < 0.01)
 
     test("3.9 — Rejeter prix 0 sur UPDATE",
-         expect_error(conn, f"UPDATE places SET price = 0 WHERE id = '{PLACE_ID}'"))
+        expect_error(conn, f"UPDATE places SET price = 0 WHERE id = '{PLACE_ID}'"))
 
     print("\n  -- DELETE --")
 
@@ -343,8 +343,28 @@ def test_crud_places(conn):
     """)
     conn.commit()
 
-    test("3.10 — Rejeter suppression place avec reviews",
-         expect_error(conn, f"DELETE FROM places WHERE id = '{PLACE_ID}'"))
+        # Avec CASCADE: supprimer la place supprime aussi la review automatiquement
+    conn.execute(f"DELETE FROM places WHERE id = '{PLACE_ID}'")
+    conn.commit()
+    count = get_count(conn, f"SELECT COUNT(*) FROM places WHERE id = '{PLACE_ID}'")
+    test("3.10 — Supprimer place avec CASCADE (reviews supprimees aussi)",
+        count == 0)
+    # Vérifier que la review a bien été supprimée en cascade
+    count_reviews = get_count(conn, f"SELECT COUNT(*) FROM reviews WHERE place_id = '{PLACE_ID}'")
+    test("3.10b — Review supprimée en cascade avec la place", count_reviews == 0)
+
+    # Recréer la place et la review pour la section 4
+    conn.execute(f"""
+        INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+        VALUES ('{PLACE_ID}', 'Test Place', 'Nice', 99.99, 48.85, 2.35, '{JOHN_ID}',
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    """)
+    conn.execute(f"""
+        INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
+        VALUES ('{REVIEW1_ID}', 'Test', 4, '{JANE_ID}', '{PLACE_ID}',
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    """)
+    conn.commit()
 
 
 # ============================================================
@@ -370,34 +390,34 @@ def test_crud_reviews(conn):
     test("4.2 — Creer deuxieme review valide (Admin)", row and row[0] == 5)
 
     test("4.3 — Rejeter doublon user/place",
-         expect_error(conn, f"""
-             INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
-             VALUES ('cccc0003-0000-0000-0000-000000000000', 'Dup', 3,
-                     '{JANE_ID}', '{PLACE_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
+            VALUES ('cccc0003-0000-0000-0000-000000000000', 'Dup', 3,
+                    '{JANE_ID}', '{PLACE_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("4.4 — Rejeter rating > 5",
-         expect_error(conn, f"""
-             INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
-             VALUES ('cccc0004-0000-0000-0000-000000000000', 'Bad', 10,
-                     '{JANE_ID}', '{PLACE_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
+            VALUES ('cccc0004-0000-0000-0000-000000000000', 'Bad', 10,
+                    '{JANE_ID}', '{PLACE_ID}', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("4.5 — Rejeter user_id inexistant",
-         expect_error(conn, f"""
-             INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
-             VALUES ('cccc0005-0000-0000-0000-000000000000', 'Ghost', 3,
-                     'ffffffff-ffff-ffff-ffff-ffffffffffff', '{PLACE_ID}',
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
+            VALUES ('cccc0005-0000-0000-0000-000000000000', 'Ghost', 3,
+                    'ffffffff-ffff-ffff-ffff-ffffffffffff', '{PLACE_ID}',
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     test("4.6 — Rejeter place_id inexistant",
-         expect_error(conn, f"""
-             INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
-             VALUES ('cccc0006-0000-0000-0000-000000000000', 'Ghost', 3,
-                     '{JANE_ID}', 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-                     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-         """))
+        expect_error(conn, f"""
+            INSERT INTO reviews (id, text, rating, user_id, place_id, created_at, updated_at)
+            VALUES ('cccc0006-0000-0000-0000-000000000000', 'Ghost', 3,
+                    '{JANE_ID}', 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     print("\n  -- READ --")
 
@@ -407,11 +427,11 @@ def test_crud_reviews(conn):
         JOIN places p ON r.place_id = p.id
     """)
     test("4.7 — Lire toutes les reviews avec auteur et lieu",
-         len(rows) == 2)
+        len(rows) == 2)
 
     rows = get_all(conn, f"SELECT id FROM reviews WHERE place_id = '{PLACE_ID}'")
     test("4.8 — Lire les reviews d'une place specifique (2 attendus)",
-         len(rows) == 2)
+        len(rows) == 2)
 
     print("\n  -- UPDATE --")
 
@@ -419,10 +439,10 @@ def test_crud_reviews(conn):
     conn.commit()
     row = get_one(conn, f"SELECT text, rating FROM reviews WHERE id = '{REVIEW1_ID}'")
     test("4.9 — Modifier texte et rating d'une review",
-         row and row[0] == "Updated!" and row[1] == 3)
+        row and row[0] == "Updated!" and row[1] == 3)
 
     test("4.10 — Rejeter rating 0 sur UPDATE",
-         expect_error(conn, f"UPDATE reviews SET rating = 0 WHERE id = '{REVIEW1_ID}'"))
+        expect_error(conn, f"UPDATE reviews SET rating = 0 WHERE id = '{REVIEW1_ID}'"))
 
     print("\n  -- DELETE --")
 
@@ -448,35 +468,67 @@ def test_relations(conn):
     test("5.1 — Lier 2 amenities a une place", count == 2)
 
     test("5.2 — Rejeter doublon place_amenity",
-         expect_error(conn, f"INSERT INTO place_amenity VALUES ('{PLACE_ID}', '{WIFI_ID}')"))
+        expect_error(conn, f"INSERT INTO place_amenity VALUES ('{PLACE_ID}', '{WIFI_ID}')"))
 
     test("5.3 — Rejeter place_id inexistant dans place_amenity",
-         expect_error(conn, f"""
-             INSERT INTO place_amenity (place_id, amenity_id)
-             VALUES ('ffffffff-ffff-ffff-ffff-ffffffffffff', '{WIFI_ID}')
-         """))
+        expect_error(conn, f"""
+            INSERT INTO place_amenity (place_id, amenity_id)
+            VALUES ('ffffffff-ffff-ffff-ffff-ffffffffffff', '{WIFI_ID}')
+        """))
 
     test("5.4 — Rejeter amenity_id inexistant dans place_amenity",
-         expect_error(conn, f"""
-             INSERT INTO place_amenity (place_id, amenity_id)
-             VALUES ('{PLACE_ID}', 'ffffffff-ffff-ffff-ffff-ffffffffffff')
-         """))
+        expect_error(conn, f"""
+            INSERT INTO place_amenity (place_id, amenity_id)
+            VALUES ('{PLACE_ID}', 'ffffffff-ffff-ffff-ffff-ffffffffffff')
+        """))
 
-    test("5.5 — Rejeter suppression amenity liee",
-         expect_error(conn, f"DELETE FROM amenities WHERE id = '{WIFI_ID}'"))
+    conn.execute(f"DELETE FROM amenities WHERE id = '{WIFI_ID}'")
+    conn.commit()
+    count = get_count(conn, f"SELECT COUNT(*) FROM amenities WHERE id = '{WIFI_ID}'")
+    test("5.5 — Supprimer amenity avec CASCADE (liens place_amenity supprimes)",
+            count == 0)
+    count_links = get_count(conn, f"SELECT COUNT(*) FROM place_amenity WHERE amenity_id = '{WIFI_ID}'")
+    test("5.5b — Lien place_amenity supprimé en cascade", count_links == 0)
 
-    test("5.6 — Rejeter suppression user avec places",
-         expect_error(conn, f"DELETE FROM users WHERE id = '{JOHN_ID}'"))
+        # Remettre le WiFi pour la suite (initial_data)
+    conn.execute(f"""
+            INSERT INTO amenities (id, name, created_at, updated_at)
+            VALUES ('{WIFI_ID}', 'WiFi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """)
+    conn.commit()
+
+    conn.execute(f"DELETE FROM users WHERE id = '{JOHN_ID}'")
+    conn.commit()
+    count = get_count(conn, f"SELECT COUNT(*) FROM users WHERE id = '{JOHN_ID}'")
+    test("5.6 — Supprimer user avec CASCADE (places + reviews supprimes)",
+            count == 0)
+    count_places = get_count(conn, f"SELECT COUNT(*) FROM places WHERE owner_id = '{JOHN_ID}'")
+    test("5.6b — Places de John supprimées en cascade", count_places == 0)
+
+        # Remettre John pour les sections suivantes
+    conn.execute(f"""
+            INSERT INTO users (id, first_name, last_name, email, password, is_admin, created_at, updated_at)
+            VALUES ('{JOHN_ID}', 'John', 'Doe', 'john@test.com',
+                    '$2b$12$Z24N6SlkS8E6YEjB5weWseNPC8oPALbIfEIjM/AanPP9JuheGsZFq',
+                    FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """)
+    conn.execute(f"""
+            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+            VALUES ('{PLACE_ID}', 'Test Place', 'Nice', 99.99, 48.85, 2.35, '{JOHN_ID}',
+                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """)
+    conn.commit()
 
     rows = get_all(conn, f"""
-        SELECT p.title, u.first_name, a.name FROM places p
-        JOIN users u ON p.owner_id = u.id
-        JOIN place_amenity pa ON p.id = pa.place_id
-        JOIN amenities a ON pa.amenity_id = a.id
+        SELECT p.id, u.id, a.id
+        FROM places p
+        LEFT JOIN users u ON p.owner_id = u.id
+        LEFT JOIN place_amenity pa ON p.id = pa.place_id
+        LEFT JOIN amenities a ON pa.amenity_id = a.id
         WHERE p.id = '{PLACE_ID}'
     """)
     test("5.7 — JOIN complet Place + Owner + Amenities (2 lignes)",
-         len(rows) == 2)
+        len(rows) == 2)
 
     orphans = get_count(conn, """
         SELECT COUNT(*) FROM places p
@@ -561,7 +613,7 @@ def test_final_state(conn):
 
     row = get_one(conn, f"SELECT email, is_admin FROM users WHERE id = '{ADMIN_ID}'")
     test("F.1 — Seul admin reste dans users",
-         row and row[0] == ADMIN_EMAIL and row[1] == 1)
+        row and row[0] == ADMIN_EMAIL and row[1] == 1)
 
     count = get_count(conn, "SELECT COUNT(*) FROM users")
     test("F.2 — 1 seul user (admin)", count == 1, f"1, obtenu {count}")
