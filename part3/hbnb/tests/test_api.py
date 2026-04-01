@@ -107,22 +107,22 @@ def test_auth():
     # TEST 1.1 — Login admin valide
     r = post("/auth/login", {"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
     test("1.1 — Login admin valide -> 200 + token",
-         r.status_code == 200 and "access_token" in r.json(),
-         f"status={r.status_code}")
+        r.status_code == 200 and "access_token" in r.json(),
+        f"status={r.status_code}")
     if r.status_code == 200:
         state["admin_token"] = r.json()["access_token"]
 
     # TEST 1.2 — Login mauvais mot de passe
     r = post("/auth/login", {"email": ADMIN_EMAIL, "password": "mauvais"})
     test("1.2 — Login mauvais mot de passe -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     # TEST 1.3 — Login email inexistant
     r = post("/auth/login", {"email": "inexistant@test.com", "password": "admin1234"})
     test("1.3 — Login email inexistant -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     # TEST 1.4 — Acces endpoint protege sans token
     r = post("/users/", {
@@ -130,23 +130,20 @@ def test_auth():
         "email": "test@test.com", "password": "pass123"
     })
     test("1.4 — POST /users/ sans token -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     # TEST 1.5 — Acces endpoint protege avec token valide
     r = post("/amenities/", {"name": "TestAuth"},
-             token=state["admin_token"])
+            token=state["admin_token"])
     test("1.5 — POST /amenities/ avec token admin -> 201",
-         r.status_code == 201,
-         f"status={r.status_code}")
+        r.status_code == 201,
+        f"status={r.status_code}")
     # Nettoyer l'amenity creee
     if r.status_code == 201:
         amenity_id = r.json().get("id")
         if amenity_id:
-            put(f"/amenities/{amenity_id}",
-                {"name": "TestAuthCleaned"},
-                token=state["admin_token"])
-
+            delete(f"/amenities/{amenity_id}",token=state["admin_token"])
 
 # ============================================================
 # SECTION 2 — CRUD : USERS
@@ -163,8 +160,8 @@ def test_crud_users():
         "email": "john@test.com", "password": "password123"
     }, token=state["admin_token"])
     test("2.1 — Creer user valide (John) -> 201",
-         r.status_code == 201,
-         f"status={r.status_code}, body={r.text[:100]}")
+        r.status_code == 201,
+        f"status={r.status_code}, body={r.text[:100]}")
     if r.status_code == 201:
         state["john_id"] = r.json()["id"]
 
@@ -174,8 +171,8 @@ def test_crud_users():
         "email": "jane@test.com", "password": "password123"
     }, token=state["admin_token"])
     test("2.2 — Creer deuxieme user (Jane) -> 201",
-         r.status_code == 201,
-         f"status={r.status_code}")
+        r.status_code == 201,
+        f"status={r.status_code}")
     if r.status_code == 201:
         state["jane_id"] = r.json()["id"]
 
@@ -185,8 +182,8 @@ def test_crud_users():
         "email": "john@test.com", "password": "password123"
     }, token=state["admin_token"])
     test("2.3 — Email duplique -> 422",
-         r.status_code == 422,
-         f"status={r.status_code}")
+        r.status_code == 422,
+        f"status={r.status_code}")
 
     # TEST 2.4 — Login John et Jane pour leurs tokens
     r = post("/auth/login", {"email": "john@test.com", "password": "password123"})
@@ -198,28 +195,28 @@ def test_crud_users():
         state["jane_token"] = r.json()["access_token"]
 
     test("2.4 — Login John et Jane -> tokens obtenus",
-         state["john_token"] is not None and state["jane_token"] is not None)
+        state["john_token"] is not None and state["jane_token"] is not None)
 
     print("\n  -- READ --")
 
     # TEST 2.5 — Lire tous les users
     r = get("/users/")
     test("2.5 — GET /users/ -> 200",
-         r.status_code == 200,
-         f"status={r.status_code}")
+        r.status_code == 200,
+        f"status={r.status_code}")
 
     # TEST 2.6 — Lire user par ID
     if state["john_id"]:
         r = get(f"/users/{state['john_id']}")
         test("2.6 — GET /users/<john_id> -> 200 avec donnees",
-             r.status_code == 200 and r.json().get("first_name") == "John",
-             f"status={r.status_code}")
+            r.status_code == 200 and r.json().get("first_name") == "John",
+            f"status={r.status_code}")
 
     # TEST 2.7 — User inexistant
     r = get("/users/00000000-0000-0000-0000-000000000000")
     test("2.7 — GET user inexistant -> 404",
-         r.status_code == 404,
-         f"status={r.status_code}")
+        r.status_code == 404,
+        f"status={r.status_code}")
 
     print("\n  -- UPDATE --")
 
@@ -229,8 +226,8 @@ def test_crud_users():
                 {"first_name": "Johnny", "last_name": "Doe"},
                 token=state["john_token"])
         test("2.8 — PUT /users/<john_id> par John -> 200",
-             r.status_code == 200,
-             f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # TEST 2.9 — Modifier profil d'un autre user
     if state["jane_id"] and state["john_token"]:
@@ -238,8 +235,8 @@ def test_crud_users():
                 {"first_name": "Hacked"},
                 token=state["john_token"])
         test("2.9 — PUT /users/<jane_id> par John -> 403",
-             r.status_code == 403,
-             f"status={r.status_code}")
+            r.status_code == 403,
+            f"status={r.status_code}")
 
     # TEST 2.10 — Modifier email via PUT /users
     if state["john_id"] and state["john_token"]:
@@ -247,8 +244,8 @@ def test_crud_users():
                 {"email": "newemail@test.com"},
                 token=state["john_token"])
         test("2.10 — Modifier email via PUT /users -> 400",
-             r.status_code == 400,
-             f"status={r.status_code}")
+            r.status_code == 400,
+            f"status={r.status_code}")
 
 
 # ============================================================
@@ -262,48 +259,48 @@ def test_crud_amenities():
 
     # TEST 3.1 — Creer amenity valide
     r = post("/amenities/",
-             {"name": "Jacuzzi", "description": "Luxury jacuzzi"},
-             token=state["admin_token"])
+            {"name": "Jacuzzi", "description": "Luxury jacuzzi"},
+            token=state["admin_token"])
     test("3.1 — POST /amenities/ admin -> 201",
-         r.status_code == 201,
-         f"status={r.status_code}")
+        r.status_code == 201,
+        f"status={r.status_code}")
     if r.status_code == 201:
         state["amenity_id"] = r.json()["id"]
 
     # TEST 3.2 — Creer amenity sans etre admin
     r = post("/amenities/",
-             {"name": "Bain de soleil"},
-             token=state["john_token"])
+            {"name": "Bain de soleil"},
+            token=state["john_token"])
     test("3.2 — POST /amenities/ user normal -> 403",
-         r.status_code == 403,
-         f"status={r.status_code}")
+        r.status_code == 403,
+        f"status={r.status_code}")
 
     # TEST 3.3 — Creer amenity sans token
     r = post("/amenities/", {"name": "NoToken"})
     test("3.3 — POST /amenities/ sans token -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     print("\n  -- READ --")
 
     # TEST 3.4 — Lire toutes les amenities
     r = get("/amenities/")
     test("3.4 — GET /amenities/ -> 200",
-         r.status_code == 200,
-         f"status={r.status_code}")
+        r.status_code == 200,
+        f"status={r.status_code}")
 
     # TEST 3.5 — Lire amenity par ID
     if state["amenity_id"]:
         r = get(f"/amenities/{state['amenity_id']}")
         test("3.5 — GET /amenities/<id> -> 200",
-             r.status_code == 200 and r.json().get("name") == "Jacuzzi",
-             f"status={r.status_code}")
+            r.status_code == 200 and r.json().get("name") == "Jacuzzi",
+            f"status={r.status_code}")
 
     # TEST 3.6 — Amenity inexistante
     r = get("/amenities/00000000-0000-0000-0000-000000000000")
     test("3.6 — GET amenity inexistante -> 404",
-         r.status_code == 404,
-         f"status={r.status_code}")
+        r.status_code == 404,
+        f"status={r.status_code}")
 
     print("\n  -- UPDATE --")
 
@@ -313,8 +310,8 @@ def test_crud_amenities():
                 {"name": "Jacuzzi VIP", "description": "Luxury private jacuzzi"},
                 token=state["admin_token"])
         test("3.7 — PUT /amenities/<id> admin -> 200",
-             r.status_code == 200,
-             f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # TEST 3.8 — Modifier amenity sans etre admin
     if state["amenity_id"]:
@@ -322,8 +319,8 @@ def test_crud_amenities():
                 {"name": "Hacked"},
                 token=state["john_token"])
         test("3.8 — PUT /amenities/<id> user normal -> 403",
-             r.status_code == 403,
-             f"status={r.status_code}")
+            r.status_code == 403,
+            f"status={r.status_code}")
 
 
 # ============================================================
@@ -345,8 +342,8 @@ def test_crud_places():
         "amenities": [WIFI_ID]
     }, token=state["john_token"])
     test("4.1 — POST /places/ John -> 201",
-         r.status_code == 201,
-         f"status={r.status_code}, body={r.text[:150]}")
+        r.status_code == 201,
+        f"status={r.status_code}, body={r.text[:150]}")
     if r.status_code == 201:
         state["place_id"] = r.json()["id"]
 
@@ -357,8 +354,8 @@ def test_crud_places():
         "amenities": []
     }, token=state["john_token"])
     test("4.2 — Prix negatif -> 400",
-         r.status_code == 400,
-         f"status={r.status_code}")
+        r.status_code == 400,
+        f"status={r.status_code}")
 
     # TEST 4.3 — Latitude invalide
     r = post("/places/", {
@@ -367,8 +364,8 @@ def test_crud_places():
         "amenities": []
     }, token=state["john_token"])
     test("4.3 — Latitude invalide -> 400",
-         r.status_code == 400,
-         f"status={r.status_code}")
+        r.status_code == 400,
+        f"status={r.status_code}")
 
     # TEST 4.4 — Sans token
     r = post("/places/", {
@@ -377,32 +374,32 @@ def test_crud_places():
         "amenities": []
     })
     test("4.4 — POST /places/ sans token -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     print("\n  -- READ --")
 
     # TEST 4.5 — Lire toutes les places
     r = get("/places/")
     test("4.5 — GET /places/ -> 200",
-         r.status_code == 200,
-         f"status={r.status_code}")
+        r.status_code == 200,
+        f"status={r.status_code}")
 
     # TEST 4.6 — Lire place par ID avec owner et amenities
     if state["place_id"]:
         r = get(f"/places/{state['place_id']}")
         data = r.json()
         test("4.6 — GET /places/<id> retourne owner et amenities",
-             r.status_code == 200
-             and "owner" in data
-             and "amenities" in data,
-             f"status={r.status_code}, keys={list(data.keys())}")
+            r.status_code == 200
+            and "owner" in data
+            and "amenities" in data,
+            f"status={r.status_code}, keys={list(data.keys())}")
 
     # TEST 4.7 — Place inexistante
     r = get("/places/00000000-0000-0000-0000-000000000000")
     test("4.7 — GET place inexistante -> 404",
-         r.status_code == 404,
-         f"status={r.status_code}")
+        r.status_code == 404,
+        f"status={r.status_code}")
 
     print("\n  -- UPDATE --")
 
@@ -412,8 +409,8 @@ def test_crud_places():
                 {"title": "Appartement Paris Renove", "price": 150.00},
                 token=state["john_token"])
         test("4.8 — PUT /places/<id> par proprio -> 200",
-             r.status_code == 200,
-             f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # TEST 4.9 — Modifier place d'un autre
     if state["place_id"] and state["jane_token"]:
@@ -421,8 +418,8 @@ def test_crud_places():
                 {"title": "Hacked place"},
                 token=state["jane_token"])
         test("4.9 — PUT /places/<id> par autre user -> 403",
-             r.status_code == 403,
-             f"status={r.status_code}")
+            r.status_code == 403,
+            f"status={r.status_code}")
 
 
 # ============================================================
@@ -442,8 +439,8 @@ def test_crud_reviews():
             "place_id": state["place_id"]
         }, token=state["jane_token"])
         test("5.1 — POST /reviews/ Jane -> 201",
-             r.status_code == 201,
-             f"status={r.status_code}")
+            r.status_code == 201,
+            f"status={r.status_code}")
         if r.status_code == 201:
             state["review_id"] = r.json()["id"]
 
@@ -455,8 +452,8 @@ def test_crud_reviews():
             "place_id": state["place_id"]
         }, token=state["john_token"])
         test("5.2 — Review sur sa propre place -> 400",
-             r.status_code == 400,
-             f"status={r.status_code}")
+            r.status_code == 400,
+            f"status={r.status_code}")
 
     # TEST 5.3 — Doublon review
     if state["place_id"] and state["jane_token"]:
@@ -466,8 +463,8 @@ def test_crud_reviews():
             "place_id": state["place_id"]
         }, token=state["jane_token"])
         test("5.3 — Doublon review -> 400",
-             r.status_code == 400,
-             f"status={r.status_code}")
+            r.status_code == 400,
+            f"status={r.status_code}")
 
     # TEST 5.4 — Rating invalide
     if state["place_id"] and state["admin_token"]:
@@ -477,8 +474,8 @@ def test_crud_reviews():
             "place_id": state["place_id"]
         }, token=state["admin_token"])
         test("5.4 — Rating invalide -> 400",
-             r.status_code == 400,
-             f"status={r.status_code}")
+            r.status_code == 400,
+            f"status={r.status_code}")
 
     # TEST 5.5 — Sans token
     r = post("/reviews/", {
@@ -486,30 +483,30 @@ def test_crud_reviews():
         "place_id": state["place_id"] or "fake-id"
     })
     test("5.5 — POST /reviews/ sans token -> 401",
-         r.status_code == 401,
-         f"status={r.status_code}")
+        r.status_code == 401,
+        f"status={r.status_code}")
 
     print("\n  -- READ --")
 
     # TEST 5.6 — Lire toutes les reviews
     r = get("/reviews/")
     test("5.6 — GET /reviews/ -> 200",
-         r.status_code == 200,
-         f"status={r.status_code}")
+        r.status_code == 200,
+        f"status={r.status_code}")
 
     # TEST 5.7 — Lire review par ID
     if state["review_id"]:
         r = get(f"/reviews/{state['review_id']}")
         test("5.7 — GET /reviews/<id> -> 200",
-             r.status_code == 200,
-             f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # TEST 5.8 — Lire reviews d'une place
     if state["place_id"]:
         r = get(f"/places/{state['place_id']}/reviews")
         test("5.8 — GET /places/<id>/reviews -> 200",
-             r.status_code == 200,
-             f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # TEST 5.9 — Reviews place inexistante
     r = get("/places/00000000-0000-0000-0000-000000000000/reviews")
@@ -716,17 +713,23 @@ def test_relations():
         data = r.json()
         owner_id = data.get("owner_id") or (data.get("owner") or {}).get("id")
         test("7.5 — owner_id de la place = ID de John (JWT)",
-             owner_id == state["john_id"],
-             f"owner_id={owner_id}, john_id={state['john_id']}")
+            owner_id == state["john_id"],
+            f"owner_id={owner_id}, john_id={state['john_id']}")
 
-    def test_delete_endpoints():
-        section("SECTION 8 — DELETE : Users, Places, Amenities")
+# ============================================================
+# SECTION 8 — DELETE : Users, Places, Amenities
+# ============================================================
+
+def test_delete_endpoints():
+    section("SECTION 8 — DELETE : Users, Places, Amenities")
+
+    #--- USERS ---
 
     # 8.1 — Non-admin ne peut pas supprimer un user
     if state["john_id"] and state["john_token"]:
         r = delete(f"/users/{state['john_id']}", token=state["john_token"])
         test("8.1 — User normal supprime user -> 403",
-             r.status_code == 403, f"status={r.status_code}")
+            r.status_code == 403, f"status={r.status_code}")
 
     # 8.2 — Admin ne peut pas se supprimer lui-même
     # (récupérer l'admin_id via GET /users/)
@@ -740,47 +743,55 @@ def test_relations():
     if admin_id:
         r = delete(f"/users/{admin_id}", token=state["admin_token"])
         test("8.2 — Admin se supprime lui-même -> 400",
-             r.status_code == 400, f"status={r.status_code}")
+            r.status_code == 400,
+            f"status={r.status_code}")
 
     # 8.3 — Admin supprime user inexistant -> 404
     r = delete("/users/00000000-0000-0000-0000-000000000000",
-               token=state["admin_token"])
+            token=state["admin_token"])
     test("8.3 — DELETE user inexistant -> 404",
-         r.status_code == 404, f"status={r.status_code}")
+        r.status_code == 404,
+        f"status={r.status_code}")
 
     # 8.4 — Non-propriétaire ne peut pas supprimer une place
     if state["place_id"] and state["jane_token"]:
-        r = delete(f"/places/{state['place_id']}", token=state["jane_token"])
+        r = delete(f"/places/{state['place_id']}",
+                token=state["jane_token"])
         test("8.4 — Non-propriétaire supprime place -> 403",
-             r.status_code == 403, f"status={r.status_code}")
+            r.status_code == 403,
+            f"status={r.status_code}")
 
     # 8.5 — Supprimer place inexistante -> 404
     r = delete("/places/00000000-0000-0000-0000-000000000000",
-               token=state["admin_token"])
+            token=state["admin_token"])
     test("8.5 — DELETE place inexistante -> 404",
-         r.status_code == 404, f"status={r.status_code}")
+        r.status_code == 404,
+        f"status={r.status_code}")
 
     # 8.6 — Non-admin ne peut pas supprimer une amenity
     if state["amenity_id"] and state["john_token"]:
-        r = delete(f"/amenities/{state['amenity_id']}", token=state["john_token"])
+        r = delete(f"/amenities/{state['amenity_id']}",
+                token=state["john_token"])
         test("8.6 — User normal supprime amenity -> 403",
-             r.status_code == 403, f"status={r.status_code}")
+            r.status_code == 403,
+            f"status={r.status_code}")
 
     # 8.7 — Supprimer amenity inexistante -> 404
     r = delete("/amenities/00000000-0000-0000-0000-000000000000",
-               token=state["admin_token"])
+            token=state["admin_token"])
     test("8.7 — DELETE amenity inexistante -> 404",
-         r.status_code == 404, f"status={r.status_code}")
+        r.status_code == 404, f"status={r.status_code}")
 
     # 8.8 — Admin supprime une amenity -> 200
     # Créer une amenity temporaire pour le test
     r = post("/amenities/", {"name": "Temp Delete Test"},
-             token=state["admin_token"])
+            token=state["admin_token"])
     if r.status_code == 201:
         temp_amenity_id = r.json()["id"]
         r = delete(f"/amenities/{temp_amenity_id}", token=state["admin_token"])
         test("8.8 — Admin supprime amenity -> 200",
-             r.status_code == 200, f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
     # 8.9 — Owner supprime sa place -> 200 (et vérifie la cascade reviews)
     # Créer une place temporaire et une review pour tester la cascade
@@ -797,13 +808,16 @@ def test_relations():
                 "place_id": temp_place_id
             }, token=state["jane_token"])
             # John supprime sa place (cascade doit supprimer la review)
-            r = delete(f"/places/{temp_place_id}", token=state["john_token"])
+            r = delete(f"/places/{temp_place_id}",
+                    token=state["john_token"])
             test("8.9 — Owner supprime sa place -> 200",
-                 r.status_code == 200, f"status={r.status_code}")
+                r.status_code == 200,
+                f"status={r.status_code}")
             # Vérifier que la place n'existe plus
             r_check = get(f"/places/{temp_place_id}")
             test("8.10 — Place supprimée bien absente -> 404",
-                 r_check.status_code == 404, f"status={r_check.status_code}")
+                r_check.status_code == 404,
+                f"status={r_check.status_code}")
 
     # 8.11 — Admin supprime un user -> 200 (et cascade ses places/reviews)
     # Créer un user temporaire
@@ -813,9 +827,11 @@ def test_relations():
     }, token=state["admin_token"])
     if r.status_code == 201:
         temp_user_id = r.json()["id"]
-        r = delete(f"/users/{temp_user_id}", token=state["admin_token"])
+        r = delete(f"/users/{temp_user_id}",
+                token=state["admin_token"])
         test("8.11 — Admin supprime user -> 200",
-             r.status_code == 200, f"status={r.status_code}")
+            r.status_code == 200,
+            f"status={r.status_code}")
 
 # ============================================================
 # MAIN
