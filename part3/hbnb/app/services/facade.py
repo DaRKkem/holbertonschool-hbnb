@@ -210,6 +210,10 @@ class HBnBFacade:
         place.save()
         return place
 
+    def delete_place(self, place_id):
+        """Delete a place by ID."""
+        return self.place_repo.delete(place_id)
+
     # ==================================================
     # REVIEW METHODS
     # ==================================================
