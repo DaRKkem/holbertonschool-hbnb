@@ -505,18 +505,21 @@ def test_relations(conn):
     count_places = get_count(conn, f"SELECT COUNT(*) FROM places WHERE owner_id = '{JOHN_ID}'")
     test("5.6b — Places de John supprimées en cascade", count_places == 0)
 
-        # Remettre John pour les sections suivantes
+    # Remettre John, sa place, et les liens amenity pour les tests 5.7+
+    # (5.7 teste un JOIN Place + Owner + 2 Amenities = 2 lignes attendues)
     conn.execute(f"""
-            INSERT INTO users (id, first_name, last_name, email, password, is_admin, created_at, updated_at)
-            VALUES ('{JOHN_ID}', 'John', 'Doe', 'john@test.com',
-                    '$2b$12$Z24N6SlkS8E6YEjB5weWseNPC8oPALbIfEIjM/AanPP9JuheGsZFq',
-                    FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        """)
+        INSERT INTO users (id, first_name, last_name, email, password, is_admin, created_at, updated_at)
+        VALUES ('{JOHN_ID}', 'John', 'Doe', 'john@test.com',
+                '{BCRYPT_HASH}', FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    """)
     conn.execute(f"""
-            INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
-            VALUES ('{PLACE_ID}', 'Test Place', 'Nice', 99.99, 48.85, 2.35, '{JOHN_ID}',
-                    CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        """)
+        INSERT INTO places (id, title, description, price, latitude, longitude, owner_id, created_at, updated_at)
+        VALUES ('{PLACE_ID}', 'Test Place', 'Nice', 99.99, 48.85, 2.35, '{JOHN_ID}',
+                CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    """)
+    # Re-lier WiFi et Pool a la place reconstituee (necessaire pour le test 5.7 = 2 lignes)
+    conn.execute(f"INSERT INTO place_amenity (place_id, amenity_id) VALUES ('{PLACE_ID}', '{WIFI_ID}')")
+    conn.execute(f"INSERT INTO place_amenity (place_id, amenity_id) VALUES ('{PLACE_ID}', '{POOL_ID}')")
     conn.commit()
 
     rows = get_all(conn, f"""
