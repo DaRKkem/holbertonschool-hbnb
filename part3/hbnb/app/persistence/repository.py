@@ -103,7 +103,7 @@ class SQLAlchemyRepository(Repository):
 
     def get(self, obj_id):
         """Retrieve an object by its primary key."""
-        return self.model.query.get(obj_id)
+        return self.db.session.get(self.model, obj_id)
 
     def get_all(self):
         """Retrieve all objects of this model."""

@@ -78,5 +78,5 @@ class Place(BaseModel):
 
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
-    reviews = db.relationship('Review', backref='place')
+    reviews = db.relationship('Review', backref='place', cascade='all, delete-orphan')
     amenities = db.relationship('Amenity', secondary='place_amenity', backref='places')
