@@ -9,12 +9,14 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 import sqlite3
 
 bcrypt = Bcrypt()
+cors = CORS()
 jwt = JWTManager()
 db =  SQLAlchemy()
 
@@ -43,6 +45,8 @@ def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
 
     app.config.from_object(config_class)
+
+    CORS(app)
 
     bcrypt.init_app(app)
     jwt.init_app(app)
