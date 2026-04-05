@@ -1,0 +1,527 @@
+/*
+  HBnB - Part 4 Styles
+  Author: Holberton Student
+  Description: Main stylesheet for HBnB Simple Web Client
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ========== CSS Variables ========== */
+:root {
+  --primary: #1a1a2e;
+  --accent: #e94560;
+  --accent-hover: #c73652;
+  --bg: #f8f7f4;
+  --surface: #ffffff;
+  --border: #ddd;
+  --text: #333;
+  --text-muted: #666;
+  --radius-card: 10px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hover: 0 8px 30px rgba(0,0,0,0.14);
+  --transition: 0.25s ease;
+}
+
+/* ========== Reset ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== Base ========== */
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ========== Header ========== */
+header {
+  background-color: var(--primary);
+  color: #fff;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+header .logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
+
+header .logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.login-button {
+  background-color: var(--accent);
+  color: #fff;
+  padding: 0.45rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color var(--transition), transform var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* ========== Nav ========== */
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+nav a {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.95rem;
+  font-weight: 400;
+  transition: color var(--transition);
+}
+
+nav a:hover {
+  color: #fff;
+}
+
+/* ========== Footer ========== */
+footer {
+  background-color: var(--primary);
+  color: rgba(255,255,255,0.6);
+  text-align: center;
+  padding: 1.2rem 2rem;
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
+/* ========== Main ========== */
+main {
+  flex: 1;
+  padding: 2.5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ========== Section Title ========== */
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+/* ========== Filter bar ========== */
+#filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: var(--surface);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+}
+
+#filter label {
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+#filter select,
+#price-filter {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+
+#filter select:focus,
+#price-filter:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ========== Places Grid ========== */
+#places-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ========== Place Card ========== */
+.place-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  margin: 20px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform var(--transition);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.place-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+}
+
+.place-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.place-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+.place-card .price {
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+
+.place-card .details-button {
+  margin-top: auto;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color var(--transition);
+  text-align: center;
+  display: inline-block;
+}
+
+.place-card .details-button:hover {
+  background-color: var(--accent);
+}
+
+/* ========== Place Details ========== */
+.place-details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.place-details img.place-hero {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.place-details h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.place-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+
+.place-info .info-item {
+  background: var(--bg);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.place-info .info-item span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.2rem;
+}
+
+.place-info .info-item strong {
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+.place-details .description {
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 1rem 0;
+}
+
+.amenities-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.amenity-tag {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+/* ========== Reviews ========== */
+#reviews {
+  margin-bottom: 2rem;
+}
+
+#reviews h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  margin: 20px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+}
+
+.review-card .reviewer {
+  font-weight: 500;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+
+.review-card .rating {
+  color: var(--accent);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.review-card .comment {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* ========== Add Review Section ========== */
+.add-review {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  margin: 20px;
+  box-shadow: var(--shadow);
+}
+
+.add-review h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: 1.2rem;
+}
+
+/* ========== Forms ========== */
+.form,
+form#login-form,
+form#review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+form label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.2rem;
+  display: block;
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+  transition: border-color var(--transition);
+}
+
+form input:focus,
+form textarea:focus,
+form select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+form button[type="submit"] {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition), transform var(--transition);
+  align-self: flex-start;
+}
+
+form button[type="submit"]:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+/* ========== Login Page ========== */
+.login-wrapper {
+  min-height: calc(100vh - 70px - 55px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+}
+
+.login-box h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ========== Error / Success messages ========== */
+.message {
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: none;
+}
+
+.message.error {
+  background: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5c6c6;
+}
+
+.message.success {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #c8e6c9;
+}
+
+/* ========== Add review page wrapper ========== */
+.review-page-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ========== Button link ========== */
+.btn-link {
+  display: inline-block;
+  background-color: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color var(--transition);
+  margin-top: 1rem;
+}
+
+.btn-link:hover {
+  background-color: var(--accent-hover);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+  header {
+    padding: 0 1rem;
+    height: 60px;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  .place-details h1 {
+    font-size: 1.5rem;
+  }
+
+  #places-list {
+    grid-template-columns: 1fr;
+  }
+}
