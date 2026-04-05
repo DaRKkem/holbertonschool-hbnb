@@ -46,7 +46,7 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     app.config.from_object(config_class)
 
-    CORS(app)
+    CORS(app, origins=["http://localhost:5500"], supports_credentials=True)
 
     bcrypt.init_app(app)
     jwt.init_app(app)
