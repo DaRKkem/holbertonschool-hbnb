@@ -43,6 +43,7 @@ def create_app(config_class="config.DevelopmentConfig"):
         Flask: Configured Flask application instance.
     """
     app = Flask(__name__)
+    app.url_map.strict_slashes = False
 
     app.config.from_object(config_class)
 
